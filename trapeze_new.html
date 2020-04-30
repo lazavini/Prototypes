@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<head>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<title>Geometry, AR Cone!</title>
+	<script src='js/three.js'></script>
+	<script src='js/keyboard.js'></script>
+	<script src='js/initialize.js'></script>
+	<script src="jsartoolkit5/artoolkit.min.js"></script>
+	<script src="jsartoolkit5/artoolkit.api.js"></script>
+	<script src="threex/threex-artoolkitsource.js"></script>
+	<script src="threex/threex-artoolkitcontext.js"></script>
+	<script src="threex/threex-arbasecontrols.js"></script>
+	<script src="threex/threex-armarkercontrols.js"></script>
+	<link rel="stylesheet" type="text/css" href="stylesheets/style.css">
+
+</head>
+<body style='margin : 0px; overflow: hidden; font-family: Monospace;'>
+	<h2>Code Example</h2>
+	<h2>Constructor</h2>
+	<h3>BoxGeometry(width : <span class="param">Float</span>, height : <span class="param">Float</span>, depth : <span class="param">Float</span>, widthSegments : <span class="param">Integer</span>, heightSegments : <span class="param">Integer</span>, depthSegments : <span class="param">Integer</span>)</h3>
+	<p>
+		width : Width; that is, the length of the edges parallel to the X axis. Optional; defaults to 1.<br>
+		height : Height; that is, the length of the edges parallel to the Y axis. Optional; defaults to 1.<br>
+		depth : Depth; that is, the length of the edges parallel to the Z axis. Optional; defaults to 1.<br>
+		widthSegments : Number of segmented rectangular faces along the width of the sides. Optional; defaults to 1.<br>
+		heightSegments : Number of segmented rectangular faces along the height of the sides. Optional; defaults to 1.<br>
+		depthSegments : Number of segmented rectangular faces along the depth of the sides. Optional; defaults to 1.<br>
+		</p>
+	<div id="main">
+		<label for="width">Radius[1-30]:</label><br>
+	  	<input type="Number" id="radius" name="radius"><br>
+	 	<label for="height_txt">Height[1-50]:</label><br>
+	  	<input type="Number" id="height" name="height"><br>
+	  	<label for="radios_seg_text">Radios Segments[3-64]:</label><br>
+	  	<input type="Number" id="radios_seg" name="radios_seg"><br>
+	  	<label for="heightSegmentsL">Height Segments:</label><br>
+	   	<input type="Number" id="heightSegments" name="heightSegments">
+		<br><br>
+	  <button id="draw_btn" onclick="draw();">DRAW</button>
+
+</div>
+<script>
+	function validaCampoTexto(id) {
+		var valor = document.getElementById(id).value;
+		//testa se o valor é nulo, vazio ou formado por apenas espaços em branco
+		if ( (valor == null) || (valor == "") || (/^\s+$/.test(valor)) ) {
+		return false;
+		}
+		return true;
+		}
+	function validaCampoNumerico(id) {
+		var valor = document.getElementById(id).value;
+		if (isNaN(valor) ) {
+			return false;
+		}
+		return true;
+}
+	function draw() {
+		// Hide draw button.
+		document.getElementById('draw_btn').style.visibility = 'hidden';
+		document.getElementById('main').style.visibility = 'hidden';
+		
+		var obj = initialize();
+		/* DRAWING parseFloat(elementos)*/ 
+		var a,b,c,d,e,f;
+		a= parseFloat(document.getElementById('radius').value);
+		b= parseFloat(document.getElementById('height').value);
+		c= parseFloat(document.getElementById('radios_seg').value);
+		e= parseFloat(document.getElementById('heightSegments').value);
+		f=1;
+
+		// Cone in scene.
+		let geometry = new THREE.CylinderGeometry( a,b,c,e,f);
+		let material = new THREE.MeshNormalMaterial({
+			transparent: true,
+			opacity: 0.5,
+			side: THREE.DoubleSide
+		});
+
+		mesh = new THREE.Mesh( geometry, material );
+		mesh.position.y = 0.5;
+
+		markerRoot = obj['marker_root'];
+		markerRoot.add(mesh);
+
+		/* ANIMATE */
+		animate();
+
+
+		function animate() {
+			requestAnimationFrame(animate);
+
+			clock = obj['clock'];
+			totalTime = obj['totalTime'];
+
+			deltaTime = clock.getDelta();
+			totalTime += deltaTime;
+
+			update();
+			render();
+		}
+
+		function update() {
+			arToolkitSource = obj['arToolkitSource'];
+			arToolkitContext = obj['arToolkitContext'];
+
+			// Update artoolkit on every frame.
+			if ( arToolkitSource.ready !== false )
+				arToolkitContext.update( arToolkitSource.domElement );
+		}
+
+		function render() {
+			renderer = obj['renderer'];
+			scene = obj['scene'];
+			camera = obj['camera'];
+
+			renderer.render(scene, camera);
+		}
+	}
+</script>
+
+</body>
+</html>
